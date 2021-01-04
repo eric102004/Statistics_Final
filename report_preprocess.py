@@ -6,7 +6,7 @@ import numpy as np
 
 class RDataset:
     def __init__(self):
-        self.val_inc_set = parameters.new_val_inc_set
+        self.val_inc_set = parameters.full_val_inc_set
         self.net_income_dict = None
         self.count_dict = None
         self.val_inc_count = None
@@ -46,7 +46,7 @@ class RDataset:
                                 self.count_dict[inc_id] = self.count_dict.get(inc_id, 0) + 1
                         except:
                             err +=1
-        '''
+        '''        
         #print the number
         print('full_count_dict:', self.full_count_dict)
         count_list = [0 for i in range(13)]
@@ -56,10 +56,12 @@ class RDataset:
         new_parameters = set()
         for inc,v in self.full_count_dict.items():
             if v >= 10 and inc>=1000:
+                print(v)
                 new_parameters.add(inc)
         print('new_parameters:', new_parameters)
         print(done)
         '''
+        
 
         self.val_inc_count = 0
         for inc ,c in self.count_dict.items():
@@ -69,7 +71,8 @@ class RDataset:
         #compute income_sum_dict
         self.income_sum_dict = {}
         for inc_id in list(self.val_inc_set):
-            assert len(self.net_income_dict[inc_id])==12
+            print(len(self.net_income_dict[inc_id]))
+            assert len(self.net_income_dict[inc_id])>=10
             self.income_sum_dict[inc_id] = sum(self.net_income_dict[inc_id])
 
         print('net_income_dict:',self.net_income_dict)
@@ -83,8 +86,8 @@ class RDataset:
     def cal_return_ratio(self):
         self.return_ratio_dict = {}
         for inc_id in list(self.val_inc_set):
-            assert len(self.net_income_dict[inc_id])==12
-            income_sum = sum(self.net_income_dict[inc_id])
+            assert len(self.net_income_dict[inc_id])>=10
+            income_sum = sum(self.net_income_dict[inc_id]) / len(self.net_income_dict[inc_id])
             initial_price = self.initial_price[inc_id]
             return_ratio = income_sum / initial_price
             self.return_ratio_dict[inc_id] = return_ratio
@@ -106,9 +109,9 @@ class RDataset:
             y.append(return_ratio)
         plt.scatter(x, y)
         plt.xlabel('volatility')
-        plt.ylabel('return ratio')                 #中文？？
-        plt.title('return_ratio vs volatility')
-        plt.savefig('figure/scatter/scatter.png')
+        plt.ylabel('mean P2E ratio')                 #中文？？
+        plt.title('mean P2E ratio vs. volatility')
+        plt.savefig('figure/scatter/new_scatter.png')
         plt.clf()
 
     def get_corrcoef(self):

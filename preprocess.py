@@ -5,10 +5,11 @@ import math
 class Dataset:
     def __init__(self):
         self.price_dict = {}
-        self.val_inc_set = parameters.new_val_inc_set
+        self.val_inc_set = parameters.full_val_inc_set
         self.num_val_inc = len(self.val_inc_set)
         self.initial_price = {}
         self.inc_count = {}
+        self.val_inc_count = {}
 
 
     def get_data(self):
@@ -34,6 +35,7 @@ class Dataset:
                             if inc_id in self.val_inc_set:
                                 self.price_dict[inc_id] = self.price_dict.get(inc_id, [])
                                 self.price_dict[inc_id].append(price)
+                                self.val_inc_count[inc_id] = self.val_inc_count.get(inc_id, 0) +1
                         except:
                             err += 1
                 else:
@@ -51,6 +53,18 @@ class Dataset:
                         except:
                             err+=1
         self.num_inc = len(self.inc_count.keys())
+
+        '''        
+        print('inc_count:',self.val_inc_count)
+        self.new_parameters = set()
+        for inc,v in self.val_inc_count.items():
+            if v>=60 and inc>=1000:
+                self.new_parameters.add(inc)
+        #print('count_list:',count_list)
+        print('new_parameters:', self.new_parameters)
+        print(done)
+        '''
+        
 
         #get initial price
         with open('data/EMmes010.201401-C.txt',encoding='big5-hkscs') as f:
@@ -73,11 +87,11 @@ class Dataset:
         for inc_id in list(self.val_inc_set):                                                
             log_return_list = []
             price_list = self.price_dict[inc_id]
-            assert len(price_list)==72
+            assert len(price_list)>=60
             for t in range(len(price_list)-1):
                 log_return = math.log(price_list[t+1]) - math.log(price_list[t])
                 log_return_list.append(log_return)
-            assert len(log_return_list)==71
+            assert len(log_return_list)>=59
             return_mean = sum(log_return_list) / len(log_return_list)
             vol = 0
             for r in log_return_list:
