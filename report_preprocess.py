@@ -13,6 +13,8 @@ class RDataset:
         self.dataset = Dataset()
         self.initial_price = None
         self.return_ratio_dict = None
+        self.full_inc_set = dict()
+        self.full_count_dict = dict()
 
     def get_data(self):
         self.dataset.get_data()
@@ -34,12 +36,31 @@ class RDataset:
                         try:
                             inc_id = int(char_list[0])
                             net_income = float(char_list[1])
+                            #using full dict to check if company has full data
+                            self.full_inc_set[inc_id] = self.full_inc_set.get(inc_id, [])
+                            self.full_inc_set[inc_id].append(net_income)
+                            self.full_count_dict[inc_id] = self.full_count_dict.get(inc_id, 0) +1
                             if inc_id in self.val_inc_set:
                                 self.net_income_dict[inc_id] = self.net_income_dict.get(inc_id, [])
                                 self.net_income_dict[inc_id].append(net_income)
                                 self.count_dict[inc_id] = self.count_dict.get(inc_id, 0) + 1
                         except:
                             err +=1
+        '''
+        #print the number
+        print('full_count_dict:', self.full_count_dict)
+        count_list = [0 for i in range(13)]
+        for v in self.full_count_dict.values():
+            count_list[v] +=1
+        print('count_list:',count_list)
+        new_parameters = set()
+        for inc,v in self.full_count_dict.items():
+            if v >= 10 and inc>=1000:
+                new_parameters.add(inc)
+        print('new_parameters:', new_parameters)
+        print(done)
+        '''
+
         self.val_inc_count = 0
         for inc ,c in self.count_dict.items():
             if c==12:
@@ -85,7 +106,7 @@ class RDataset:
             y.append(return_ratio)
         plt.scatter(x, y)
         plt.xlabel('volatility')
-        plt.ylabel('return ratio')
+        plt.ylabel('return ratio')                 #中文？？
         plt.title('return_ratio vs volatility')
         plt.savefig('figure/scatter/scatter.png')
         plt.clf()
