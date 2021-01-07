@@ -129,6 +129,53 @@ class RDataset:
 
         print('correlation coefficient:', self.corrcoef)
 
+    def get_index_data(self):
+        self.cash_ratio_dict = dict()
+        self.quick_ratio_dict = dict()
+        self.current_ratio_dict = dict()
+        self.ipm_dict = dict()
+        self.cash_flow_ratio_dict = dict()
+        self.dict_list = [None, None, None, None, self.cash_ratio_dict, self.quick_ratio_dict, self.current_ratio_dict, self.ipm_dict, self.cash_flow_ratio_dict, None]
+        with open('index/mean.csv', encoding='utf-8') as f:
+            lines = f.readlines()
+            for line in lines[1:]:
+                char_list = line.strip().split(',')
+                inc_id = int(char_list[0])
+                for index in range(1,10):
+                    try:
+                        self.dict_list[index][inc_id] = float(char_list[index])
+                    except:
+                        continue
+
+    def plot_index_scatter_and_get_corrcoef(self):
+        self.xlabel_list = [None ,'debt ratio', 'debt-to-net worth ratio', 'financial report score', 'cash ratio', 'quick ratio', 'current ratio', 'ipm', 'cash_flow_ratio', 'stability']
+        for index in range(1,10):
+            x_list = []
+            y_list = []
+            x_dict = self.dict_list[index]
+            if x_dict==None:
+                continue
+            y_dict = self.return_ratio_dict
+            for inc in list(self.val_inc_set):
+                if inc not in x_dict or inc not in y_dict:
+                    print(f'incomplete data :{inc}')
+                else:
+                    if -1000<=x_dict[inc]<=1000:
+                        x_list.append(x_dict[inc])
+                        y_list.append(y_dict[inc])
+            xlabel = self.xlabel_list[index]
+            plt.scatter(x_list, y_list)
+            plt.xlabel(xlabel)
+            plt.ylabel('mean P2E ratio')
+            plt.title(f'mean P2E ratio vs. {xlabel}')
+            plt.savefig(f'figure/scatter/{xlabel}.png')
+            plt.clf()
+            #get corrcoef
+            x_array = np.array(x_list)
+            y_array = np.array(y_list)
+            corrcoef = np.corrcoef(x_array, y_array)[0][1]
+            with open(f'figure/corrcoef/{xlabel}.txt', 'w+') as f:
+                f.write(f'corrcoef: {corrcoef}\n')
 
 
 if __name__ =='__main__':
@@ -138,3 +185,5 @@ if __name__ =='__main__':
     r.cal_volatility()
     r.plot_scatter()
     r.get_corrcoef()
+    r.get_index_data()
+    r.plot_index_scatter_and_get_corrcoef()
