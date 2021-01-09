@@ -3,3 +3,4 @@ figure/*
 financial_report/*
 __pycache__/*
 report_backup/*
+index/.*

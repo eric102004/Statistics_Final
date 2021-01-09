@@ -130,13 +130,16 @@ class RDataset:
         print('correlation coefficient:', self.corrcoef)
 
     def get_index_data(self):
+        self.debt_ratio_dict = dict()
+        self.d2n_ratio_dict = dict()
+        self.report_score_dict = dict()
         self.cash_ratio_dict = dict()
         self.quick_ratio_dict = dict()
         self.current_ratio_dict = dict()
         self.ipm_dict = dict()
         self.cash_flow_ratio_dict = dict()
-        self.dict_list = [None, None, None, None, self.cash_ratio_dict, self.quick_ratio_dict, self.current_ratio_dict, self.ipm_dict, self.cash_flow_ratio_dict, None]
-        with open('index/mean.csv', encoding='utf-8') as f:
+        self.dict_list = [None, self.debt_ratio_dict, self.d2n_ratio_dict, self.report_score_dict, self.cash_ratio_dict, self.quick_ratio_dict, self.current_ratio_dict, self.ipm_dict, self.cash_flow_ratio_dict, None]
+        with open('index/new_mean.csv', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines[1:]:
                 char_list = line.strip().split(',')
